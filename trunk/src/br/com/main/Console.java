@@ -1,5 +1,7 @@
 package br.com.main;
 
+import java.io.IOException;
+
 public class Console {
 
 	/**

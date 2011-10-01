@@ -1,3 +1,9 @@
+/*
+ * AEAD.java
+ * 
+ * Authenticated Encryption with Associated Data
+ */
+
 package br.com.interfaces;
 
 public interface AEAD {
