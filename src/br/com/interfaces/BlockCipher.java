@@ -1,3 +1,7 @@
+/*
+ * BlockCipher.java
+ */
+
 package br.com.interfaces;
 
 public interface BlockCipher {

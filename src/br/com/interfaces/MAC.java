@@ -1,3 +1,9 @@
+/*
+ * MAC.java
+ * 
+ * Message Authentication Code
+ */
+
 package br.com.interfaces;
 
 public interface MAC {
