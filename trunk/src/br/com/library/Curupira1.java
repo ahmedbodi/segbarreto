@@ -20,13 +20,12 @@ public class Curupira1 implements BlockCipher{
 	 */
 	private int blockBits;
 	private int keyBits;
-	private byte[] cipherKey;
 	private int t;
 	private int numberOfRounds;
 	private byte keyEvolution[][][];
 	
 	/*
-	 * Métodos abstratos
+	 * Métodos implementados da interface BlockCipher
 	 */
 	
 	/*
@@ -47,12 +46,23 @@ public class Curupira1 implements BlockCipher{
 	 * @see br.com.interfaces.BlockCipher#makeKey(byte[], int)
 	 */
 	public void makeKey(byte[] cipherKey, int keyBits) {
-		this.cipherKey = cipherKey;
 		this.keyBits = keyBits;
 		this.t = keyBits/48;
 		this.numberOfRounds = 4 * t + 2;
 		
-		evolveKey();
+		//Aplica o método 'keyEvolutionPsi' uma quantidade de vezes igual a "numberOfRounds" e salva cada resultado em uma matrix.
+		keyEvolution = new byte[numberOfRounds + 1][3][2 * t];
+		Util.blockToMatrix(cipherKey, keyEvolution[0], true);
+	
+		Util.copyMatrix(keyEvolution[0], keyEvolution[1]);
+		for (int i = 1; i <= numberOfRounds; i++)
+		{
+			keyEvolutionPsi(keyEvolution[i], i, false);
+			
+			if (i != numberOfRounds){
+				Util.copyMatrix(keyEvolution[i], keyEvolution[i+1]);
+			}
+		}
 	}
 	
 	/*
@@ -131,6 +141,8 @@ public class Curupira1 implements BlockCipher{
 	 * Página 6 do artigo:
 	 * 3.1. The nonlinear layer gama
 	 * gama(a) = b <=> b[i][j] = S[a[i][j]] para i de 0 a 3 e j de 0 a n
+	 * Utiliza o Algoritmo 1 especificado abaixo.
+	 * 
 	 * @param textMatrix Matrix de byte
 	 */
 	private void nonLinearLayerGama (byte[][] textMatrix){
@@ -145,6 +157,7 @@ public class Curupira1 implements BlockCipher{
 	 * Página 7 do artigo:
 	 * 3.2. The permutation layer pi
 	 * pi(a) = b <=> b[i][j] = a[i][i ^ j]
+	 * 
 	 * @param textMatrix Matrix of byte
 	 */
 	public void permutationLayerPi(byte[][] textMatrix) {
@@ -163,6 +176,7 @@ public class Curupira1 implements BlockCipher{
 	 * theta(a) = b <=> b = D * a
 	 * 
 	 * D * a - calculado usando o Algoritmo 2 na página 13 do artigo
+	 * 
 	 * @param textMatrix Matrix of byte
 	 */
 	private void linearDiffusionLayerTheta(byte[][] textMatrix) {
@@ -182,6 +196,7 @@ public class Curupira1 implements BlockCipher{
 	 * Página 7 do artigo:
 	 * 3.4. The key addition sigma[k]
 	 * sigma[k](a) = b <=> b[i][j] = a[i][j] ^ k[i][j] para 9 de 0 a 3 e j de 0 a n
+	 * 
 	 * @param textMatrix Matrix of byte
 	 * @param key Matrix of byte
 	 */
@@ -196,9 +211,10 @@ public class Curupira1 implements BlockCipher{
 	/**
 	 * Figura da página 6 do artigo:
 	 * Figura 2. A estrutura de rodada de Curupira-1
-	 * Executa 'gama', 'pi', 'theta' and 'sigma' em sequencia (encrypt = true)
-	 * or
-	 * Executa sigma', 'theta', 'pi' and 'gama' em sequencia (encrypt = false)
+	 * Executa 'gama', 'pi', 'theta' e 'sigma' em sequencia (encrypt = true)
+	 * ou
+	 * Executa sigma', 'theta', 'pi' e 'gama' em sequencia (encrypt = false)
+	 * 
 	 * @param textMatrix Matrix of byte
 	 * @param key Matrix of byte 
 	 */
@@ -222,10 +238,11 @@ public class Curupira1 implements BlockCipher{
 	**/
 	
 	/**
-	 * Figura 3 na página 8 do artigo:
+	 * Figura da página 8 do artigo:
 	 * Figura 3. O cronograma chave de Curupira-1
 	 * 3.7. The key evolution 'psi'
 	 * Executa 'sigma', 'csi' e 'mi' em sequencia
+	 * 
 	 * @param key Matrix of byte
 	 * @param round int
 	 * @param invert boolean
@@ -238,32 +255,45 @@ public class Curupira1 implements BlockCipher{
 	}
 	
 	/**
-	 * Aplica o método 'keyEvolutionPsi' uma quantidade de vezes igual a "numberOfRounds" 
-	 * e salva cada resultado em uma matrix. 
-	 */
-	private void evolveKey(){
-		keyEvolution = new byte[numberOfRounds + 1][3][2 * t];
-		Util.blockToMatrix(cipherKey, keyEvolution[0], true);
-	
-		Util.copyMatrix(keyEvolution[0], keyEvolution[1]);
-		for (int i = 1; i <= numberOfRounds; i++)
-		{
-			keyEvolutionPsi(keyEvolution[i], i, false);
-			
-			if (i != numberOfRounds){
-				Util.copyMatrix(keyEvolution[i], keyEvolution[i+1]);
-			}
-		}	
-	}
-	
-	/**
 	 * Página 8 do artigo:
 	 * 3.7. The constant addition layer 'sigma'
+	 * 
+	 * Utiliza o item 3.6. 'Schedule constants' na página 7 do artigo:
+	 * q(0) = 0
+	 * q[i][j](s) = S[2t(s-1) + j]		if i=0
+	 * q[i][j](s) = 0 					otherwise
+	 * Utiliza o Algoritmo 1 especificado abaixo.
+	 * 
 	 * @param key Matrix of byte[][]
 	 * @param round int
 	 */
 	private void constantAdditionLayerSigma(byte[][] key, int round){
-		byte q[][] = q(round);
+		int t = keyBits / 48;
+		byte[][] q = new byte[3][2*t];
+		
+		//q(0) = 0
+		if(round == 0x00){
+			for (int i = 0; i < 3; i++){
+				for (int j = 0; j < (2 * t); j++){
+					q[i][j] = (byte)0x00;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 3; i++){
+				for (int j = 0; j < (2 * t); j++){
+					//i = 0
+					if(i == 0){
+						q[i][j] = S((byte)(0x02 * t * (round - 0x01) + j));
+					}
+					//ou
+					else{
+						q[i][j] = (byte)0x00;
+					}
+				}
+			}
+		}
 		
 		for (int i = 0; i < key.length; i++)
 			for (int j = 0; j < key[i].length; j++)
@@ -276,6 +306,7 @@ public class Curupira1 implements BlockCipher{
 	 * Csi(a) = b <=> 	b[0][j] = a[0][j]
 	 * 					b[1][j] = a[1][(j + 1) mod 2t]
 	 * 					b[2][j] = a[2][(j - 1) mod 2t]
+	 * 
 	 * @param Matrix of byte[][] a
 	 * @return Matrix of byte[][] b
 	 */
@@ -303,6 +334,7 @@ public class Curupira1 implements BlockCipher{
 	 * 3.7. The linear diffusion layer 'mi'
 	 * mi(a) = E * a, where E = I + c * C
 	 * E * a - calculado usando o Algoritmo 3 na página 14 do artigo.
+	 * 
 	 * @param Matrix of byte[][]
 	 * @param Boolean invert [select E (false) or E^-1 (true)]
 	 * @return Matrix of byte[][] b = E * a 
@@ -329,6 +361,8 @@ public class Curupira1 implements BlockCipher{
 	 * Página 9 do artigo:
 	 * 3.8. The key selection 'phi'<br/>
 	 * k(r) = phi[r](K) <=> k[0][j](r) = S[K[0][j](r)] and k[i][j](r) = K[i][j](r) para i maior que 0 e j entre 0 e 4.
+	 * Utiliza Algoritmo 1 especificado abaixo.
+	 * 
 	 * @param key Matrix of byte
 	 * @return k the truncated cipher key matrix
 	 */
@@ -354,6 +388,7 @@ public class Curupira1 implements BlockCipher{
 	/**
 	 * No artigo de apoio que o Barreto passou
 	 * xtimes
+	 * 
 	 * @param x int
 	 * @return xtimes(x) int
 	 */
@@ -367,6 +402,7 @@ public class Curupira1 implements BlockCipher{
 	/**
 	 * Página 13 do artigo:
 	 * ctimes
+	 * 
 	 * @param x int
 	 * @return ctimes(x) int
 	 */
@@ -376,7 +412,8 @@ public class Curupira1 implements BlockCipher{
 	
 	/**
 	 * Algoritmo 1, na página 6 do artigo:
-	 * Computing S [u] from the mini-boxes P and Q
+	 * 'Computing S [u] from the mini-boxes P and Q'
+	 * 
 	 * @param u byte
 	 * @return S(u) byte
 	 */
@@ -394,43 +431,5 @@ public class Curupira1 implements BlockCipher{
 		ul1 = Q[((uh2 << 0x02) & 0x0C) ^ (ul2 & 0x03)];
 
 		return (byte) ((uh1 << 0x04) ^ ul1);
-	}
-	
-	/**
-	 * As constantes de programação q
-	 * q(0) = 0
-	 * q[i][j](s) = S[2t(s-1) + j]		if i=0
-	 * q[i][j](s) = 0 					otherwise
-	 * @param s Matrix of byte
-	 * @return q(s) Matrix of byte
-	 */
-	private byte[][] q(int s){
-		int t = keyBits / 48;
-		byte[][] q = new byte[3][2*t];
-		
-		//q(0) = 0
-		if(s == 0x00){
-			for (int i = 0; i < 3; i++){
-				for (int j = 0; j < (2 * t); j++){
-					q[i][j] = (byte)0x00;
-				}
-			}
-		}
-		else
-		{
-			for (int i = 0; i < 3; i++){
-				for (int j = 0; j < (2 * t); j++){
-					//i = 0
-					if(i == 0){
-						q[i][j] = S((byte)(0x02 * t * (s - 0x01) + j));
-					}
-					//ou
-					else{
-						q[i][j] = (byte)0x00;
-					}
-				}
-			}
-		}
-		return q;
 	}
 }
