@@ -59,4 +59,45 @@ public class Util {
 			for (int j = 0; j < in[i].length; j++)
 				out[i][j] = in[i][j];
 	}
+	
+	/*
+	 * Left pad a byte
+	 */
+	public static byte[] lpad(byte[] B, int n){
+		byte[] C = new byte[n/8];
+		
+		if(n<B.length/8)
+			return B;
+		
+		for (int i = 0; i < n/8 - B.length; i++) {
+			C[i] = 0;
+		}
+		
+		for (int i = B.length; i < n/8; i++) {
+			C[i] = B[i];
+		}
+		
+		
+		return C;
+	}
+	
+	/*
+	 * Right pad a byte
+	 */
+	public static byte[] rpad(byte[] B, int n){
+		byte[] C = new byte[n/8];
+		
+		if(n<B.length/8)
+			return B;
+		
+		for (int i = 0; i < n/8 - B.length; i++) {
+			C[i] = B[i];
+		}
+		
+		for (int i = B.length; i < n/8; i++) {
+			C[i] = 0;
+		}
+		
+		return C;
+	}
 }

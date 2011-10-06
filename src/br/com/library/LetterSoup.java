@@ -13,12 +13,15 @@ import br.com.interfaces.MAC;
 
 public class LetterSoup implements AEAD {
 	
+	private MAC mac;
+	private byte[] iv;
+	private int ivLength;
 	/*
 	 * @see br.com.interfaces.AEAD#setMAC(br.com.interfaces.MAC)
 	 */
 	@Override
 	public void setMAC(MAC mac) {
-		// TODO Auto-generated method stub
+		this.mac = mac;
 		
 	}
 	
@@ -27,8 +30,7 @@ public class LetterSoup implements AEAD {
 	 */
 	@Override
 	public void setCipher(BlockCipher cipher) {
-		// TODO Auto-generated method stub
-		
+		this.mac.setCipher(cipher);
 	}
 
 	/*
@@ -36,7 +38,7 @@ public class LetterSoup implements AEAD {
 	 */
 	@Override
 	public void setKey(byte[] cipherKey, int keyBits) {
-		// TODO Auto-generated method stub
+		this.mac.setKey(cipherKey, keyBits);
 		
 	}
 
@@ -45,7 +47,8 @@ public class LetterSoup implements AEAD {
 	 */
 	@Override
 	public void setIV(byte[] iv, int ivLength) {
-		// TODO Auto-generated method stub
+		this.iv = iv;
+		this.ivLength = ivLength;
 		
 	}
 	
