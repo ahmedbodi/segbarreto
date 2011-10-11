@@ -58,5 +58,15 @@ public interface MAC {
 	allocated, otherwise the input buffer is returned.
 	*/
 	byte[] getTag(byte[] tag, int tagBits);
+	
+	/**
+	 * Complete if necessary the data processing and
+	 * get the MAC tag of the whole message provided.
+	 * @param tag 	the MAC tag buffer.
+	 * @return MAC tag of the whole message. 
+	 * If the tag parameter is null, a new buffer is automatically 
+	 * allocated, otherwise the input buffer is returned. 
+	 */
+	byte[] getTag(byte[] tag, int tagBits, boolean encript);
 
 }

@@ -15,7 +15,7 @@ import br.com.interfaces.BlockCipher;
 
 public class Curupira1 implements BlockCipher{
 
-	/*
+	/**
 	 * Variáveis locais
 	 */
 	private int blockBits;
@@ -24,25 +24,25 @@ public class Curupira1 implements BlockCipher{
 	private int numberOfRounds;
 	private byte keyEvolution[][][];
 	
-	/*
+	/**
 	 * Métodos implementados da interface BlockCipher
 	 */
 	
-	/*
+	/**
 	 * @see br.com.interfaces.BlockCipher#blockBits()
 	 */
 	public int blockBits() {
 		return this.blockBits;
 	}
 	
-	/*
+	/**
 	 * @see br.com.interfaces.BlockCipher#keyBits()
 	 */
 	public int keyBits() {
 		return this.keyBits;
 	}
 	
-	/*
+	/**
 	 * @see br.com.interfaces.BlockCipher#makeKey(byte[], int)
 	 */
 	public void makeKey(byte[] cipherKey, int keyBits) {
@@ -50,7 +50,7 @@ public class Curupira1 implements BlockCipher{
 		this.t = keyBits/48;
 		this.numberOfRounds = 4 * t + 2;
 		
-		//Aplica o método 'keyEvolutionPsi' uma quantidade de vezes igual a "numberOfRounds" e salva cada resultado em uma matrix.
+		//Aplica o método 'keyEvolutionPsi' uma quantidade de vezes igual a "numberOfRounds" e salva cada resultado em uma matriz.
 		keyEvolution = new byte[numberOfRounds + 1][3][2 * t];
 		Util.blockToMatrix(cipherKey, keyEvolution[0], true);
 	
@@ -65,12 +65,12 @@ public class Curupira1 implements BlockCipher{
 		}
 	}
 	
-	/*
+	/**
 	 * @see br.com.interfaces.BlockCipher#encrypt(byte[], byte[])
 	 */
 	@Override
 	public void encrypt(byte[] mBlock, byte[] cBlock) {
-		// De plain text para matrix
+		// De plain text para matriz
 		byte[][] blockMatrix = new byte[3][4];
 		Util.blockToMatrix(mBlock, blockMatrix, true);
 		
@@ -90,12 +90,12 @@ public class Curupira1 implements BlockCipher{
 		
 	}
 	
-	/*
+	/**
 	 * @see br.com.interfaces.BlockCipher#decrypt(byte[], byte[])
 	 */
 	@Override
 	public void decrypt(byte[] cBlock, byte[] mBlock) {
-		// De plain text para matrix
+		// De plain text para matriz
 		byte[][] cipherMatrix = new byte[3][4];
 		Util.blockToMatrix(cBlock, cipherMatrix, true);
 		
@@ -116,7 +116,7 @@ public class Curupira1 implements BlockCipher{
 		
 	}
 	
-	/*
+	/**
 	 * @see br.com.interfaces.BlockCipher#sct(byte[], byte[])
 	 */
 	@Override
