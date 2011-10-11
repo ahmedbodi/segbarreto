@@ -73,4 +73,14 @@ public interface AEAD {
 	otherwise the provided buffer is returned.
 	*/
 	byte[] decrypt(byte[] cData, int cLength, byte[] mData);
+	
+	/**
+	 * Complete if necessary the data processing and 
+	 * get the MAC tag of the whole message provided. 
+	 * @param tag		the MAC tag buffer. 
+	 * @return MAC tag of the whole message 
+	 * If the tag parameter is null, a new one is allocated automatically, 
+	 * otherwise the input buffer is returned)
+	 */
+	byte[] getTag(byte[] tag, int tagBits);
 }
