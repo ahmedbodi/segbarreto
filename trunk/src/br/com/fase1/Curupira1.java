@@ -8,7 +8,7 @@
  * schedule, and cyclic key schedule, whereby the round subkeys can be computed in-place in any order.
  */
 
-package br.com.library;
+package br.com.fase1;
 
 import br.com.utils.Util;
 import br.com.interfaces.BlockCipher;

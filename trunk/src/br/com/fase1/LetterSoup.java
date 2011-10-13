@@ -6,7 +6,7 @@
  * of operation and shows a high performance.
  */
 
-package br.com.library;
+package br.com.fase1;
 
 import br.com.interfaces.AEAD;
 import br.com.interfaces.BlockCipher;
