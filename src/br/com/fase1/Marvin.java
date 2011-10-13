@@ -5,7 +5,7 @@
  * A new, fully parallelizable MAC called MARVIN, based on the ALRED family and designed with resource-constrained platforms in mind.
  */
 
-package br.com.library;
+package br.com.fase1;
 
 import br.com.interfaces.BlockCipher;
 import br.com.interfaces.MAC;

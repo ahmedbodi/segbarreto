@@ -18,11 +18,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.SecureRandom;
 
-import br.com.library.*;
+import br.com.fase1.*;
 import br.com.utils.Printer;
 import br.com.utils.Util;
 
-public class Console {
+public class ConsoleFase1 {
 	
 	private static InputStreamReader inputStreamReader = new InputStreamReader(System.in);
 	private static BufferedReader reader = new BufferedReader(inputStreamReader);
