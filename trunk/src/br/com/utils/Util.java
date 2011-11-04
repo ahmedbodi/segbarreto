@@ -236,4 +236,22 @@ public class Util {
 		
 		return output;
 	}
+	
+	public static byte[] not (byte[] in) {
+		byte[] output = new byte[in.length];
+		
+		for (int i = 0; i < in.length; i++)
+			output[i] = (byte)(in[i] ^ 0xFF);
+		
+		return output;
+	}
+	
+	public static byte[] and (byte[] a, byte[] b) {
+		byte[] output = new byte[a.length];
+		
+		for (int i = 0; i < a.length; i++)
+			output[i] = (byte)(a[i] & b[i]);
+		
+		return output;
+	}
 }
