@@ -10,7 +10,6 @@ import br.com.utils.Util;
 
 
 public class ConsoleFase2 {
-//	private static boolean debug = false;
 	
 	private static InputStreamReader inputStreamReader = new InputStreamReader(System.in);
 	private static BufferedReader reader = new BufferedReader(inputStreamReader);
@@ -223,12 +222,6 @@ public class ConsoleFase2 {
 				// Validacao
 				byte[] data = Util.readFile(file); 
 				if (null != data) {
-					
-//					if (debug){
-//						System.out.println("Arquivo \"" + file	+ "\" lido com sucesso.");
-//						System.out.println("Conteudo do arquivo: " + Printer.getVectorAsPlainText(data));
-//					}
-					
 					return data;
 				} else {
 					System.out.print("O arquivo \"" + file + "\" nao foi encontrado. " + instructions);
