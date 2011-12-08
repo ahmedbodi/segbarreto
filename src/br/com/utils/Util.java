@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
+import br.com.fase2.Keccak;
+import br.com.fase2.KeccakPRG;
+import br.com.interfaces.SpongePRG;
 
 /**
  * 
@@ -72,7 +78,7 @@ public class Util {
 	 * Converte um byte simples para o respectivo valor hexadecimal
 	 */
 	public static String byteToHex(byte b) {
-		return Integer.toString((b & 0xFF) + 0x100, 16).substring(1);
+		return Integer.toString( ( b & 0xff ) + 0x100, 16).substring( 1 ).toUpperCase();
 	}
 
 	/**
@@ -80,9 +86,9 @@ public class Util {
 	 */
 	public static String byteToHex(byte[] b) {
 		String result = "";
-		for (int i = 0; i < b.length; i++)
-			result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
-		return result;
+        for (int i = 0; i < b.length; i++) 
+                result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+        return result.toUpperCase();
 	}
 
 	/**
@@ -150,8 +156,7 @@ public class Util {
 	/**
 	 * Salva arquivo
 	 */
-	public static boolean saveFile(String filePath, byte[] data)
-			throws IOException {
+	public static boolean saveFile(String filePath, byte[] data) throws IOException {
 		File file = new File(filePath);
 		FileOutputStream fis = new FileOutputStream(file);
 		fis.write(data);
@@ -254,4 +259,66 @@ public class Util {
 		
 		return output;
 	}
+
+    /**
+     * Converte uma string em hexadecimal para um array de bytes.
+     */
+    public static byte[] hexStringToByteArray(String s) 
+    {
+            int len = s.length();
+            byte[] data = new byte[len / 2];
+            for (int i = 0; i < len; i += 2) {
+                    data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character
+                                    .digit(s.charAt(i + 1), 16));
+            }
+            return data;
+    }
+    
+    public static BigInteger byteArrayToBigInteger (byte[] M) {
+            byte[] M1 = new byte[M.length + 1];
+            M1[0] = 0;
+            
+            for (int i = 1; i < M1.length; i++)
+                    M1[i] = M[i-1];
+            
+            return new BigInteger(M1);
+    }
+    
+    public static byte[] bigIntegerToByteArray (BigInteger bi) {
+            byte[] M1 = bi.toByteArray();
+            
+            if (M1[0] == 0 && M1.length > 1) {
+                    byte[] M = new byte[M1.length - 1];
+                    for (int i = 0; i < M.length; i++)
+                            M[i] = M1[i+1];
+                    
+                    return M;
+            }
+
+            return M1;
+    }
+
+    
+    private static final int SEED_LENGTH = 32;
+    private static final int HASH_BITRATE = 576;
+    private static final int HASH_DIVERSIFIER = 64;
+    
+    /**
+     * Obtém um numero aleatório.
+     */
+    public static byte[] getRandomNumber(int length) {
+            byte[] seed = SecureRandom.getSeed(SEED_LENGTH);
+            
+            Keccak k = new Keccak();
+            
+            k.setBitRate(HASH_BITRATE);
+            k.setDiversifier(HASH_DIVERSIFIER);
+            
+            // Instantiate a sponge object with a Keccak instance for the calculation of r. 
+            SpongePRG sponge = new KeccakPRG(k);
+            sponge.init(0);
+            sponge.feed(seed, seed.length);
+            
+            return sponge.fetch(new byte[length], length);
+    }
 }
